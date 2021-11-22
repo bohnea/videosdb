@@ -1,15 +1,18 @@
 package main;
 
+import action.Action;
 import actor.Actor;
 import checker.Checkstyle;
 import checker.Checker;
 import common.Constants;
 import database.Database;
+import database.DatabaseTrackable;
 import entertainment.Movie;
 import entertainment.Show;
 import entertainment.Video;
 import fileio.*;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import user.User;
 import utils.Utils;
 
@@ -18,9 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * The entry point to this homework. It runs the checker that tests your implementation.
@@ -124,8 +125,40 @@ public final class Main {
 
     private static void readAndStoreActions(Input input) {
         // Read the actions
-        List<ActionInputData> actionInput = input.getCommands();
-        actionInput.forEach(action -> action.)
+        List<ActionInputData> actionInputList = input.getCommands();
+
+        // For each input action, create a new Action object with the help of the ActionFactory
+        List<Action> actions = actionInputList.stream()
+                .map(ActionFactory::createAction)
+                .toList();
+
+        // Store the actions in the database
+        Database.getInstance().add(actions, Action.class);
+    }
+
+    private static void executeActionsAndWriteOutput(Writer fileWriter, JSONArray arrayResult) {
+        // Retrieve the actions from the database
+        LinkedHashMap<String, DatabaseTrackable> actions;
+        actions = Database.getInstance().retrieveClassEntities(Action.class);
+
+        // Iterate though each action and execute it
+        for (DatabaseTrackable action : actions.values()) {
+            // Safety instanceof, I don't think this is needed but just to be sure
+            if (!(action instanceof Action)) {
+                continue;
+            }
+
+            // Execute the action and keep the output
+            String actionOutput = ((Action) action).execute();
+
+            try {
+                // Write the output to the file
+                JSONObject jsonObj = fileWriter.writeFile(((Action) action).getID(), "", actionOutput);
+                arrayResult.add(jsonObj);
+            } catch(IOException e) {
+                // Do nothing
+            }
+        }
     }
 
     /**
@@ -148,13 +181,10 @@ public final class Main {
         readAndStoreActions(input);
 
         // Go through each action, in order, and execute it
+        executeActionsAndWriteOutput(fileWriter, arrayResult);
 
-        // Debugging :)
-        Database.getInstance().printAllKeys();
-        System.out.println();
-        Database.getInstance().printAllKeysAndValues();
-
-
+        // Clear the database
+        Database.getInstance().clear();
 
         fileWriter.closeJSON(arrayResult);
     }
