@@ -13,7 +13,6 @@ import org.json.simple.JSONArray;
 import user.User;
 import utils.Utils;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,7 +64,7 @@ public final class Main {
         test.testCheckstyle();
     }
 
-    private static void readInputAndFillDatabase(Input input) {
+    private static void readAndStoreInput(Input input) {
         // Read the actors
         List<ActorInputData> actorInput = input.getActors();
         ArrayList<Actor> actors = new ArrayList<>();
@@ -123,10 +122,10 @@ public final class Main {
         Database.getInstance().add(shows);
     }
 
-    private static void readActionsAndExecute(Input input) {
+    private static void readAndStoreActions(Input input) {
         // Read the actions
         List<ActionInputData> actionInput = input.getCommands();
-        // actionInput.forEach(action -> action.)
+        actionInput.forEach(action -> action.)
     }
 
     /**
@@ -142,11 +141,13 @@ public final class Main {
         Writer fileWriter = new Writer(filePath2);
         JSONArray arrayResult = new JSONArray();
 
-        // Read the input and save the information in the database
-        readInputAndFillDatabase(input);
+        // Read the input and store the information in the database
+        readAndStoreInput(input);
 
-        // Read the input actions and execute them
-        readActionsAndExecute(input);
+        // Read the input actions and store them in the database
+        readAndStoreActions(input);
+
+        // Go through each action, in order, and execute it
 
         // Debugging :)
         Database.getInstance().printAllKeys();
