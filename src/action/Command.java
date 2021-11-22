@@ -2,6 +2,7 @@ package action;
 
 import database.Database;
 import database.DatabaseTrackable;
+import entertainment.Video;
 import user.User;
 import utils.ActionExceptions;
 
@@ -57,11 +58,59 @@ public class Command extends Action {
     }
 
     private String view() {
-        return "hi";
+        // Construct the return string
+        StringBuilder message = new StringBuilder();
+
+        // Get the user by the username from the database
+        DatabaseTrackable user = Database.getInstance().retrieveEntity(User.class, username);
+
+        // For safety, check if the user is of the correct type
+        if (!(user instanceof User)) {
+            throw new ClassCastException();
+        }
+
+        try {
+            // Cast the result to User and view the video
+            int views = ((User) user).addView(title);
+
+            // If successful, create the success message
+            message.append("success -> ").append(title).append(" was viewed with total views of ").append(views);
+        } catch(ActionExceptions.EntryNotFoundException e) {
+            message.append("error -> ").append(title).append(" not found in the database");
+        }
+
+        return message.toString();
     }
 
     private String rating() {
-        return "hi";
+        // Construct the return string
+        StringBuilder message = new StringBuilder();
+
+        // Get the user/video by the username/title from the database
+        DatabaseTrackable user = Database.getInstance().retrieveEntity(User.class, username);
+        DatabaseTrackable video = Database.getInstance().retrieveEntity(Video.class, title);
+
+        // For safety, check if the user/video is of the correct type
+        if (!(video instanceof Video) || !(user instanceof User)) {
+            throw new ClassCastException();
+        }
+
+        try {
+            // Cast the result to Video and rate the video
+            ((Video) video).addRating(grade, seasonNumber, (User) user);
+
+            // If successful, create the success message
+            message.append("success -> ").append(title).append(" was rated with ")
+                    .append(grade).append(" by ").append(username);
+        } catch(ActionExceptions.EntryNotFoundException e) {
+            message.append("error -> ").append(username).append(" not found in the database");
+        } catch(ActionExceptions.AlreadyRatedException e) {
+            message.append("error -> ").append(title).append(" has been already rated");
+        } catch (ActionExceptions.NotWatchedException e) {
+            message.append("error -> ").append(title).append(" is not seen");
+        }
+
+        return message.toString();
     }
 
     @Override

@@ -9,6 +9,10 @@ public final class ActionExceptions {
         public AlreadyExistsException() { }
     }
 
+    public static class AlreadyRatedException extends Exception {
+        public AlreadyRatedException() { }
+    }
+
     public static class NotWatchedException extends Exception {
         public NotWatchedException() { }
     }

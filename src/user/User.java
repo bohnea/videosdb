@@ -20,41 +20,48 @@ public class User implements DatabaseTrackable {
 
     public String getUsername() { return username; }
 
-    public void addFavourite(String videoName)
+    public boolean hasWatched(String title) {
+        return history.containsKey(title);
+    }
+
+    public void addFavourite(String videoTitle)
             throws ActionExceptions.EntryNotFoundException,
             ActionExceptions.AlreadyExistsException,
             ActionExceptions.NotWatchedException {
         // Check the video's existence within the database
-        if (Database.getInstance().retrieveEntity(Video.class, videoName) == null) {
+        if (Database.getInstance().retrieveEntity(Video.class, videoTitle) == null) {
             throw new ActionExceptions.EntryNotFoundException();
         }
 
         // Check if the video has been watched
-        if (!history.containsKey(videoName)) {
+        if (!hasWatched(videoTitle)) {
             throw new ActionExceptions.NotWatchedException();
         }
 
         // Check if the video has already been added to favourites
-        if (favourites.contains(videoName)) {
+        if (favourites.contains(videoTitle)) {
             throw new ActionExceptions.AlreadyExistsException();
         }
 
         // If it exists and has been watched, add it to the favourites list
-        favourites.add(videoName);
+        favourites.add(videoTitle);
     }
 
-    public void addView(String videoName)
+    public int addView(String videoTitle)
             throws ActionExceptions.EntryNotFoundException {
         // Check the video's existence within the database
-        if (Database.getInstance().retrieveEntity(Video.class, videoName) == null) {
+        if (Database.getInstance().retrieveEntity(Video.class, videoTitle) == null) {
             throw new ActionExceptions.EntryNotFoundException();
         }
 
         // Get the video's views (0 if it has not been watched)
-        int views = history.getOrDefault(videoName, 0);
+        int views = history.getOrDefault(videoTitle, 0);
 
         // Add / Update the view count of the video
-        history.put(videoName, views + 1);
+        history.put(videoTitle, views + 1);
+
+        // Return the new view count
+        return views + 1;
     }
 
     public void addRating() {
