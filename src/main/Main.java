@@ -90,12 +90,14 @@ public final class Main {
                 user.getHistory()
         )));
 
+        // Read the videos
+        ArrayList<Video> videos = new ArrayList<>();
+
         // Read the movies
         List<MovieInputData> movieInput = input.getMovies();
-        ArrayList<Movie> movies = new ArrayList<>();
 
         // For each movie in the input list, create a new Movie and add it to the movies list
-        movieInput.forEach(movie -> movies.add(new Movie(
+        movieInput.forEach(movie -> videos.add(new Movie(
                 movie.getTitle(),
                 movie.getYear(),
                 movie.getDuration(),
@@ -105,10 +107,9 @@ public final class Main {
 
         // Read the shows
         List<SerialInputData> serialInput = input.getSerials();
-        ArrayList<Show> shows = new ArrayList<>();
 
         // For each show in the input list, create a new Show and add it to the shows list
-        serialInput.forEach(show -> shows.add(new Show(
+        serialInput.forEach(show -> videos.add(new Show(
                 show.getTitle(),
                 show.getYear(),
                 Utils.stringListToGenreList(show.getGenres()),
@@ -119,8 +120,7 @@ public final class Main {
         // Add everything to the database
         Database.getInstance().add(actors);
         Database.getInstance().add(users);
-        Database.getInstance().add(movies);
-        Database.getInstance().add(shows);
+        Database.getInstance().add(videos, Video.class);
     }
 
     private static void readActionsAndExecute(Input input) {

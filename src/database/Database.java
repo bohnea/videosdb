@@ -36,7 +36,7 @@ public class Database {
      * @param key the class to retrieve from the database
      * @return the HashMap storing the requested values
      */
-    private LinkedHashMap<String, DatabaseTrackable> getDatabaseEntry(Class<? extends DatabaseTrackable> key) {
+    private LinkedHashMap<String, DatabaseTrackable> retrieveClassEntities(Class<? extends DatabaseTrackable> key) {
         if (!database.containsKey(key)) {
             database.put(key, new LinkedHashMap<>());
         }
@@ -45,7 +45,27 @@ public class Database {
     }
 
     /**
-     * Adds the given entities to the corresponding (runtime) class in the database, storing them in
+     * Adds the given entities to the given class in the database, storing them in the appropriate HashMap.
+     * Useful when you have multiple subclasses of a class extending DatabaseTrackable and want to put
+     * all of them in a single database entry.
+     * @param entities the list of entities to be stored in the database
+     * @param cls the class where to store the entities in the database
+     */
+    public void add(List<? extends DatabaseTrackable> entities, Class<? extends DatabaseTrackable> cls) {
+        // If the entities list is empty, do nothing
+        if (entities.isEmpty()) {
+            return;
+        }
+
+        // Get the database map of the given class
+        LinkedHashMap<String, DatabaseTrackable> entityMap = retrieveClassEntities(cls);
+
+        // Add the entities to the appropriate hashmap
+        entities.forEach(entity -> entityMap.putIfAbsent(entity.getKey(), entity));
+    }
+
+    /**
+     * Adds the given entities to the corresponding runtime class in the database, storing them in
      * the appropriate HashMap.
      * @param entities the list of entities to be stored in the database
      */
@@ -55,11 +75,8 @@ public class Database {
             return;
         }
 
-        // Get the database map of the given type of entities
-        LinkedHashMap<String, DatabaseTrackable> entityMap = getDatabaseEntry(entities.get(0).getClass());
-
-        // Add the entities to the appropriate hashmap
-        entities.forEach(entity -> entityMap.putIfAbsent(entity.getKey(), entity));
+        // Call the add method with the runtime class of the given entities
+        add(entities, entities.get(0).getClass());
     }
 
     public void printAllKeys() {
@@ -70,9 +87,10 @@ public class Database {
     public void printAllKeysAndValues() {
         System.out.println("Print all keys and values:");
         for (Class<? extends DatabaseTrackable> key : database.keySet()) {
+            System.out.println();
             System.out.println(key);
 
-            LinkedHashMap<String, DatabaseTrackable> entityMap = getDatabaseEntry(key);
+            LinkedHashMap<String, DatabaseTrackable> entityMap = retrieveClassEntities(key);
             for (String str : entityMap.keySet()) {
                 System.out.println(str + ": " + entityMap.get(str));
             }
