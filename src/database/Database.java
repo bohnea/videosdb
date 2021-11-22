@@ -36,7 +36,7 @@ public class Database {
      * @param key the class to retrieve from the database
      * @return the HashMap storing the requested values
      */
-    private LinkedHashMap<String, DatabaseTrackable> getDatabaseEntry(Class<? extends DatabaseTrackable> key) {
+    private LinkedHashMap<String, DatabaseTrackable> retrieveClassEntities(Class<? extends DatabaseTrackable> key) {
         if (!database.containsKey(key)) {
             database.put(key, new LinkedHashMap<>());
         }
@@ -58,7 +58,7 @@ public class Database {
         }
 
         // Get the database map of the given class
-        LinkedHashMap<String, DatabaseTrackable> entityMap = getDatabaseEntry(cls);
+        LinkedHashMap<String, DatabaseTrackable> entityMap = retrieveClassEntities(cls);
 
         // Add the entities to the appropriate hashmap
         entities.forEach(entity -> entityMap.putIfAbsent(entity.getKey(), entity));
@@ -90,7 +90,7 @@ public class Database {
             System.out.println();
             System.out.println(key);
 
-            LinkedHashMap<String, DatabaseTrackable> entityMap = getDatabaseEntry(key);
+            LinkedHashMap<String, DatabaseTrackable> entityMap = retrieveClassEntities(key);
             for (String str : entityMap.keySet()) {
                 System.out.println(str + ": " + entityMap.get(str));
             }
