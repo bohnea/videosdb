@@ -1,22 +1,30 @@
 package main;
 
+import actor.Actor;
 import checker.Checkstyle;
 import checker.Checker;
 import common.Constants;
-import fileio.Input;
-import fileio.InputLoader;
-import fileio.Writer;
+import database.Database;
+import entertainment.Movie;
+import entertainment.Show;
+import entertainment.Video;
+import fileio.*;
 import org.json.simple.JSONArray;
+import user.User;
+import utils.Utils;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
- * The entry point to this homework. It runs the checker that tests your implentation.
+ * The entry point to this homework. It runs the checker that tests your implementation.
  */
 public final class Main {
     /**
@@ -57,6 +65,70 @@ public final class Main {
         test.testCheckstyle();
     }
 
+    private static void readInputAndFillDatabase(Input input) {
+        // Read the actors
+        List<ActorInputData> actorInput = input.getActors();
+        ArrayList<Actor> actors = new ArrayList<>();
+
+        // For each actor in the input list, create a new Actor and add them to the actors list
+        actorInput.forEach(actor -> actors.add(new Actor(
+                actor.getName(),
+                actor.getCareerDescription(),
+                actor.getFilmography(),
+                actor.getAwards()
+        )));
+
+        // Read the users
+        List<UserInputData> userInput = input.getUsers();
+        ArrayList<User> users = new ArrayList<>();
+
+        // For each user in the input list, create a new User and add them to the users list
+        userInput.forEach(user -> users.add(new User(
+                user.getUsername(),
+                Utils.stringToSubscriptionType(user.getSubscriptionType()),
+                user.getFavoriteMovies(),
+                user.getHistory()
+        )));
+
+        // Read the movies
+        List<MovieInputData> movieInput = input.getMovies();
+        ArrayList<Movie> movies = new ArrayList<>();
+
+        // For each movie in the input list, create a new Movie and add it to the movies list
+        movieInput.forEach(movie -> movies.add(new Movie(
+                movie.getTitle(),
+                movie.getYear(),
+                movie.getDuration(),
+                Utils.stringListToGenreList(movie.getGenres()),
+                movie.getCast()
+        )));
+
+        // Read the shows
+        List<SerialInputData> serialInput = input.getSerials();
+        ArrayList<Show> shows = new ArrayList<>();
+
+        // For each show in the input list, create a new Show and add it to the shows list
+        serialInput.forEach(show -> shows.add(new Show(
+                show.getTitle(),
+                show.getYear(),
+                Utils.stringListToGenreList(show.getGenres()),
+                show.getCast(),
+                show.getSeasons()
+        )));
+
+        // Add everything to the database
+        Database.getInstance().add(actors);
+        Database.getInstance().add(users);
+        Database.getInstance().add(movies);
+        Database.getInstance().add(shows);
+    }
+
+    private static void readActionsAndExecute(Input input) {
+        // Read the actions
+        List<ActionInputData> actionInput = input.getCommands();
+        // actionInput.forEach(action -> action.)
+    }
+
     /**
      * @param filePath1 for input file
      * @param filePath2 for output file
@@ -70,7 +142,18 @@ public final class Main {
         Writer fileWriter = new Writer(filePath2);
         JSONArray arrayResult = new JSONArray();
 
-        //TODO add here the entry point to your implementation
+        // Read the input and save the information in the database
+        readInputAndFillDatabase(input);
+
+        // Read the input actions and execute them
+        readActionsAndExecute(input);
+
+        // Debugging :)
+        Database.getInstance().printAllKeys();
+        System.out.println();
+        Database.getInstance().printAllKeysAndValues();
+
+
 
         fileWriter.closeJSON(arrayResult);
     }

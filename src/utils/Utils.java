@@ -5,8 +5,10 @@ import common.Constants;
 import entertainment.Genre;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import user.User;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
@@ -54,6 +56,18 @@ public final class Utils {
     }
 
     /**
+     * Transforms an entire list of strings to the corresponding genre.
+     * @param genres the list of genres
+     * @return the list of type Genre
+     */
+    public static List<Genre> stringListToGenreList(final List<String> genres) {
+        // For each element in the list, map it to its Genre equivalent
+        return genres.stream()
+                .map(Utils::stringToGenre)
+                .toList();
+    }
+
+    /**
      * Transforms a string into an enum
      * @param award for actors
      * @return an ActorsAwards Enum
@@ -65,6 +79,19 @@ public final class Utils {
             case "BEST_DIRECTOR" -> ActorsAwards.BEST_DIRECTOR;
             case "BEST_PERFORMANCE" -> ActorsAwards.BEST_PERFORMANCE;
             case "PEOPLE_CHOICE_AWARD" -> ActorsAwards.PEOPLE_CHOICE_AWARD;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param subscriptionType of user
+     * @return a User.SubscriptionType Enum
+     */
+    public static User.SubscriptionType stringToSubscriptionType(final String subscriptionType) {
+        return switch (subscriptionType) {
+            case "BASIC" -> User.SubscriptionType.BASIC;
+            case "PREMIUM" -> User.SubscriptionType.PREMIUM;
             default -> null;
         };
     }
