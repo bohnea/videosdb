@@ -1,5 +1,6 @@
 package utils;
 
+import action.Command;
 import actor.ActorsAwards;
 import common.Constants;
 import entertainment.Genre;
@@ -92,6 +93,20 @@ public final class Utils {
         return switch (subscriptionType) {
             case "BASIC" -> User.SubscriptionType.BASIC;
             case "PREMIUM" -> User.SubscriptionType.PREMIUM;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param commandType of command
+     * @return a Command.Type Enum
+     */
+    public static Command.Type stringToCommandType(final String commandType) {
+        return switch (commandType) {
+            case "favorite" -> Command.Type.FAVOURITE;
+            case "view" -> Command.Type.VIEW;
+            case "rating" -> Command.Type.RATING;
             default -> null;
         };
     }
