@@ -1,9 +1,8 @@
-package main;
+package action;
 
-import action.Action;
-import action.Command;
-import action.Query;
-import action.Recommendation;
+import action.actions.Command;
+import action.actions.Query;
+import action.actions.Recommendation;
 import common.Constants;
 import fileio.ActionInputData;
 import utils.Utils;
@@ -24,7 +23,11 @@ class CommandFactory {
 class QueryFactory {
     public static Query createQuery(ActionInputData actionInput) {
         return new Query(
-                actionInput.getActionId()
+                actionInput.getActionId(),
+                Utils.stringToQueryType(actionInput.getCriteria()),
+                actionInput.getNumber(),
+                actionInput.getFilters(),
+                Utils.stringToQuerySortType(actionInput.getSortType())
         );
     }
 }
@@ -32,7 +35,10 @@ class QueryFactory {
 class RecommendationFactory {
     public static Recommendation createRecommendation(ActionInputData actionInput) {
         return new Recommendation(
-                actionInput.getActionId()
+                actionInput.getActionId(),
+                Utils.stringToRecommendationType(actionInput.getType()),
+                actionInput.getUsername(),
+                Utils.stringToGenre(actionInput.getGenre())
         );
     }
 }

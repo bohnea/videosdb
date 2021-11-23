@@ -3,7 +3,7 @@ package user;
 import database.Database;
 import database.DatabaseTrackable;
 import entertainment.Video;
-import utils.ActionExceptions;
+import common.ActionExceptions;
 
 import java.util.*;
 
@@ -13,10 +13,10 @@ public class User implements DatabaseTrackable {
         PREMIUM
     }
 
-    private String username;
-    private SubscriptionType subscriptionType;
-    private HashSet<String> favourites;
-    private LinkedHashMap<String, Integer> history;
+    private final String username;
+    private final SubscriptionType subscriptionType;
+    private final HashSet<String> favourites;
+    private final LinkedHashMap<String, Integer> history;
 
     public String getUsername() { return username; }
 
@@ -24,9 +24,13 @@ public class User implements DatabaseTrackable {
         return history.containsKey(title);
     }
 
+//    public List<String> getWatchedVideos() {
+//        return history.keySet().stream().toList();
+//    }
+
     public void addFavourite(String videoTitle)
             throws ActionExceptions.EntryNotFoundException,
-            ActionExceptions.AlreadyExistsException,
+            ActionExceptions.AlreadyFavouriteException,
             ActionExceptions.NotWatchedException {
         // Check the video's existence within the database
         if (Database.getInstance().retrieveEntity(Video.class, videoTitle) == null) {
@@ -40,7 +44,7 @@ public class User implements DatabaseTrackable {
 
         // Check if the video has already been added to favourites
         if (favourites.contains(videoTitle)) {
-            throw new ActionExceptions.AlreadyExistsException();
+            throw new ActionExceptions.AlreadyFavouriteException();
         }
 
         // If it exists and has been watched, add it to the favourites list

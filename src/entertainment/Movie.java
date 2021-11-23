@@ -1,7 +1,7 @@
 package entertainment;
 
 import user.User;
-import utils.ActionExceptions;
+import common.ActionExceptions;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,5 +47,14 @@ public class Movie extends Video {
         // Otherwise, rate the movie and add the user to the hashset
         ratings.add(rating);
         ratedUsers.add(user.getUsername());
+    }
+
+    @Override
+    public double getTotalRating() {
+        // Return the mean of all the ratings
+        return ratings.stream()
+                .mapToDouble(number -> number)
+                .average()
+                .orElse(Double.NaN);
     }
 }

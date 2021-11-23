@@ -1,6 +1,7 @@
 package main;
 
 import action.Action;
+import action.ActionFactory;
 import actor.Actor;
 import checker.Checkstyle;
 import checker.Checker;

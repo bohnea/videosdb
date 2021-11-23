@@ -27,6 +27,23 @@ public class Actor implements DatabaseTrackable {
         this.awards.putAll(awards);
     }
 
+    public int getAwardCount() {
+        // Get all the award counts and add them together
+        return awards.values().stream()
+                .reduce(0, Integer::sum);
+    }
+
+    public boolean hasAward(ActorsAwards award) {
+        // Check for the award in the awards hashset
+        return awards.containsKey(award);
+    }
+
+    public boolean hasKeyword(String word) {
+        // Turn both the word and the description to lowercase, and check
+        // if the description contains the word
+        return careerDescription.toLowerCase().contains(word.toLowerCase());
+    }
+
     @Override
     public String getKey() {
         return name;

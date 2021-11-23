@@ -1,8 +1,7 @@
 package entertainment;
 
-import database.Database;
 import user.User;
-import utils.ActionExceptions;
+import common.ActionExceptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,5 +53,20 @@ public class Show extends Video {
 
         // Add the user to the rated users set
         ratedUsers.get(index).add(user.getUsername());
+    }
+
+    private double getSeasonRating(Season season) {
+        return season.getRatings().stream()
+                .reduce(0.0d, Double::sum) / season.getRatings().size();
+    }
+
+    @Override
+    public double getTotalRating() {
+        // Return the mean of all the ratings of all the rated seasons
+        return seasons.stream()
+                .filter(season -> season.getRatings().size() > 0)
+                .mapToDouble(this::getSeasonRating)
+                .average()
+                .orElse(Double.NaN);
     }
 }
