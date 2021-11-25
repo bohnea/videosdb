@@ -1,6 +1,8 @@
 package utils;
 
-import action.Command;
+import action.actions.Command;
+import action.actions.Query;
+import action.actions.Recommendation;
 import actor.ActorsAwards;
 import common.Constants;
 import entertainment.Genre;
@@ -31,6 +33,10 @@ public final class Utils {
      * @return an Genre Enum
      */
     public static Genre stringToGenre(final String genre) {
+        if (genre == null) {
+            return null;
+        }
+
         return switch (genre.toLowerCase()) {
             case "action" -> Genre.ACTION;
             case "adventure" -> Genre.ADVENTURE;
@@ -52,7 +58,7 @@ public final class Utils {
             case "kids" -> Genre.KIDS;
             case "western" -> Genre.WESTERN;
             case "tv movie" -> Genre.TV_MOVIE;
-            default -> null;
+            default -> Genre.UNKNOWN;
         };
     }
 
@@ -107,6 +113,68 @@ public final class Utils {
             case "favorite" -> Command.Type.FAVOURITE;
             case "view" -> Command.Type.VIEW;
             case "rating" -> Command.Type.RATING;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param queryType of query
+     * @return a Query.Type Enum
+     */
+    public static Query.Type stringToQueryType(final String queryType) {
+        return switch (queryType) {
+            case "average" -> Query.Type.AVERAGE;
+            case "awards" -> Query.Type.AWARDS;
+            case "filter_description" -> Query.Type.FILTER_DESCRIPTION;
+            case "ratings" -> Query.Type.RATING;
+            case "favorite" -> Query.Type.FAVOURITE;
+            case "longest" -> Query.Type.LONGEST;
+            case "most_viewed" -> Query.Type.MOST_VIEWED;
+            case "num_ratings" -> Query.Type.NUMBER_OF_RATINGS;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param querySortType of query sort method
+     * @return a Query.SortType Enum
+     */
+    public static Query.SortType stringToQuerySortType(final String querySortType) {
+        return switch (querySortType) {
+            case "asc" -> Query.SortType.ASCENDING;
+            case "desc" -> Query.SortType.DESCENDING;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param queryObjectType of query object method
+     * @return a Query.ObjectType Enum
+     */
+    public static Query.ObjectType stringToObjectType(final String queryObjectType) {
+        return switch (queryObjectType) {
+            case "videos" -> Query.ObjectType.VIDEO;
+            case "movies" -> Query.ObjectType.MOVIE;
+            case "shows" -> Query.ObjectType.SHOW;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param recommendationType of recommendation
+     * @return a Recommendation.Type Enum
+     */
+    public static Recommendation.Type stringToRecommendationType(final String recommendationType) {
+        return switch (recommendationType) {
+            case "standard" -> Recommendation.Type.STANDARD;
+            case "best_unseen" -> Recommendation.Type.BEST_UNSEEN;
+            case "popular" -> Recommendation.Type.POPULAR;
+            case "favorite" -> Recommendation.Type.FAVOURITE;
+            case "search" -> Recommendation.Type.SEARCH;
             default -> null;
         };
     }
