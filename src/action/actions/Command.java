@@ -1,6 +1,8 @@
 package action.actions;
 
 import action.Action;
+import action.managers.search.UserSearch;
+import action.managers.search.VideoSearch;
 import database.Database;
 import database.DatabaseTrackable;
 import entertainment.Video;
@@ -56,6 +58,9 @@ public class Command extends Action {
         // Rate the video
         video.addRating(grade, seasonNumber, (User) user);
 
+        // Increase user rating count
+        user.incrementRatingCount();
+
         // If successful, create the success message
         message.append("success -> ").append(title).append(" was rated with ")
                 .append(grade).append(" by ").append(username);
@@ -67,20 +72,15 @@ public class Command extends Action {
         StringBuilder message = new StringBuilder();
 
         // Get the user/video by the username/title from the database
-        DatabaseTrackable user = Database.getInstance().retrieveEntity(User.class, username);
-        DatabaseTrackable video = Database.getInstance().retrieveEntity(Video.class, title);
-
-        // For safety, check if the user/video is of the correct type
-        if (!(user instanceof User) || !(video instanceof Video)) {
-            throw new ClassCastException();
-        }
+        User user = UserSearch.getUserByUsername(username);
+        Video video = VideoSearch.getVideoByTitle(title);
 
         try {
             // Do the desired action
             switch (type) {
-                case FAVOURITE -> favourite(message, (User) user);
-                case VIEW -> view(message, (User) user);
-                case RATING -> rating(message, (User) user, (Video) video);
+                case FAVOURITE -> favourite(message, user);
+                case VIEW -> view(message, user);
+                case RATING -> rating(message, user, video);
             }
         } catch(ActionExceptions.EntryNotFoundException e) {
             message.append("error -> ").append(username).append(" not found in the database");

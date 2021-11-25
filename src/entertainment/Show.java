@@ -56,17 +56,29 @@ public class Show extends Video {
     }
 
     private double getSeasonRating(Season season) {
+        // If the season has no ratings, consider the rating 0
+        if (season.getRatings().isEmpty()) {
+            return 0.0d;
+        }
+
+        // Otherwise, get the mean of the ratings
         return season.getRatings().stream()
                 .reduce(0.0d, Double::sum) / season.getRatings().size();
     }
 
     @Override
     public double getTotalRating() {
-        // Return the mean of all the ratings of all the rated seasons
+        // Return the mean of all the ratings of all the seasons
         return seasons.stream()
-                .filter(season -> season.getRatings().size() > 0)
                 .mapToDouble(this::getSeasonRating)
                 .average()
-                .orElse(Double.NaN);
+                .orElse(0.0d);
+    }
+
+    @Override
+    public int getDuration() {
+        return seasons.stream()
+                .map(Season::getDuration)
+                .reduce(0, Integer::sum);
     }
 }

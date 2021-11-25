@@ -55,6 +55,11 @@ public class Movie extends Video {
         return ratings.stream()
                 .mapToDouble(number -> number)
                 .average()
-                .orElse(Double.NaN);
+                .orElse(0.0d);
+    }
+
+    @Override
+    public int getDuration() {
+        return duration;
     }
 }

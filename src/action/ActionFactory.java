@@ -25,6 +25,7 @@ class QueryFactory {
         return new Query(
                 actionInput.getActionId(),
                 Utils.stringToQueryType(actionInput.getCriteria()),
+                Utils.stringToObjectType(actionInput.getObjectType()),
                 actionInput.getNumber(),
                 actionInput.getFilters(),
                 Utils.stringToQuerySortType(actionInput.getSortType())

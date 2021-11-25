@@ -1,4 +1,4 @@
-package action.managers;
+package action;
 
 import actor.Actor;
 import actor.ActorsAwards;
@@ -14,18 +14,26 @@ public class Filter {
     private List<String> words;
     private List<ActorsAwards> awards;
 
+    public Filter() {
+        year = -1;
+        genre = null;
+        words = new ArrayList<>();
+        awards = new ArrayList<>();
+    }
+
     public Filter(int year, Genre genre) {
+        this();
         this.year = year;
         this.genre = genre;
     }
 
     public Filter(List<String> words, List<ActorsAwards> awards) {
-        this.words = new ArrayList<>();
+        this();
+
         if (words != null) {
             this.words.addAll(words);
         }
 
-        this.awards = new ArrayList<>();
         if (awards != null) {
             this.awards.addAll(awards);
         }
@@ -33,9 +41,10 @@ public class Filter {
 
     private boolean filterVideo(Video video) {
         // If either filtering by year and years differ,
-        // or filtering by genre and video is not of that genre
-        return (year != -1 && year != video.getLaunchYear())
-                || (genre != null && video.isOfGenre(genre));
+        // or filtering by genre and video is not of that genre,
+        // return false (don't keep the video)
+        return !((year != -1 && year != video.getLaunchYear())
+                || (genre != null && !video.isOfGenre(genre)));
     }
 
     public List<Video> filterVideos(List<Video> videos) {
@@ -45,25 +54,26 @@ public class Filter {
     }
 
     private boolean filterActor(Actor actor) {
-        boolean toRemove = false;
+        // Initially, the actor should be kept
+        boolean toKeep = true;
 
         // For each filtering word
         for (String word : words) {
-            // If it's not found in the actor's description, filter him out
+            // If it's not found in the actor's description, don't keep him
             if (!actor.hasKeyword(word)) {
-                toRemove = true;
+                toKeep = false;
             }
         }
 
         // For each filtering award
         for (ActorsAwards award : awards) {
-            // If it's not found on the actor, filter him out
+            // If it's not found on the actor, don't keep him
             if (!actor.hasAward(award)) {
-                toRemove = true;
+                toKeep = false;
             }
         }
 
-        return toRemove;
+        return toKeep;
     }
 
     public List<Actor> filterActors(List<Actor> actors) {

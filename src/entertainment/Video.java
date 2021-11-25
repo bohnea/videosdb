@@ -39,7 +39,14 @@ public abstract class Video implements DatabaseTrackable {
 
     public abstract double getTotalRating();
 
+    public abstract int getDuration();
+
     public String getKey() {
+        return title;
+    }
+
+    @Override
+    public String toString() {
         return title;
     }
 }

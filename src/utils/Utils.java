@@ -58,7 +58,7 @@ public final class Utils {
             case "kids" -> Genre.KIDS;
             case "western" -> Genre.WESTERN;
             case "tv movie" -> Genre.TV_MOVIE;
-            default -> null;
+            default -> Genre.UNKNOWN;
         };
     }
 
@@ -145,6 +145,20 @@ public final class Utils {
         return switch (querySortType) {
             case "asc" -> Query.SortType.ASCENDING;
             case "desc" -> Query.SortType.DESCENDING;
+            default -> null;
+        };
+    }
+
+    /**
+     * Transforms a string into an enum
+     * @param queryObjectType of query object method
+     * @return a Query.ObjectType Enum
+     */
+    public static Query.ObjectType stringToObjectType(final String queryObjectType) {
+        return switch (queryObjectType) {
+            case "videos" -> Query.ObjectType.VIDEO;
+            case "movies" -> Query.ObjectType.MOVIE;
+            case "shows" -> Query.ObjectType.SHOW;
             default -> null;
         };
     }

@@ -16,17 +16,41 @@ public class User implements DatabaseTrackable {
     private final String username;
     private final SubscriptionType subscriptionType;
     private final HashSet<String> favourites;
-    private final LinkedHashMap<String, Integer> history;
+    private final LinkedHashMap<String, Integer> watchedVideos;
+
+    private int ratingCount;
+
+    public User(String username, SubscriptionType subscriptionType, List<String> favourites, Map<String, Integer> watchedVideos) {
+        // Set the basic information
+        this.username = username;
+        this.subscriptionType = subscriptionType;
+
+        // Add all the elements in the favourites list to the hashset
+        this.favourites = new HashSet<>();
+        this.favourites.addAll(favourites);
+
+        // Add all the key-value pairs in the history map to the hashmap
+        this.watchedVideos = new LinkedHashMap<>();
+        this.watchedVideos.putAll(watchedVideos);
+    }
 
     public String getUsername() { return username; }
 
+    public SubscriptionType getSubscriptionType() { return subscriptionType; }
+
+    public int getRatingCount() { return ratingCount; }
+
     public boolean hasWatched(String title) {
-        return history.containsKey(title);
+        return watchedVideos.containsKey(title);
     }
 
-//    public List<String> getWatchedVideos() {
-//        return history.keySet().stream().toList();
-//    }
+    public boolean hasFavourite(String videoTitle) {
+        return favourites.contains(videoTitle);
+    }
+
+    public int getViews(String videoTitle) {
+        return watchedVideos.getOrDefault(videoTitle, 0);
+    }
 
     public void addFavourite(String videoTitle)
             throws ActionExceptions.EntryNotFoundException,
@@ -59,35 +83,26 @@ public class User implements DatabaseTrackable {
         }
 
         // Get the video's views (0 if it has not been watched)
-        int views = history.getOrDefault(videoTitle, 0);
+        int views = watchedVideos.getOrDefault(videoTitle, 0);
 
         // Add / Update the view count of the video
-        history.put(videoTitle, views + 1);
+        watchedVideos.put(videoTitle, views + 1);
 
         // Return the new view count
         return views + 1;
     }
 
-    public void addRating() {
-
-    }
-
-    public User(String username, SubscriptionType subscriptionType, List<String> favourites, Map<String, Integer> history) {
-        // Set the basic information
-        this.username = username;
-        this.subscriptionType = subscriptionType;
-
-        // Add all the elements in the favourites list to the hashset
-        this.favourites = new HashSet<>();
-        this.favourites.addAll(favourites);
-
-        // Add all the key-value pairs in the history map to the hashmap
-        this.history = new LinkedHashMap<>();
-        this.history.putAll(history);
+    public void incrementRatingCount() {
+        ++ratingCount;
     }
 
     @Override
     public String getKey() {
+        return username;
+    }
+
+    @Override
+    public String toString() {
         return username;
     }
 }
