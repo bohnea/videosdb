@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class Movie extends Video {
-    private int duration;
-    private List<Double> ratings;
-    private HashSet<String> ratedUsers;
+public final class Movie extends Video {
+    private final int duration;
+    private final List<Double> ratings;
+    private final HashSet<String> ratedUsers;
 
-    public Movie(String title, int launchYear, int duration, List<Genre> genres, List<String> cast) {
+    public Movie(final String title, final int launchYear,
+                 final int duration, final List<Genre> genres) {
         // Set the common video values
-        super(title, launchYear, genres, cast);
+        super(title, launchYear, genres);
 
         // Set the movie specific value
         this.duration = duration;
@@ -24,8 +25,17 @@ public class Movie extends Video {
         ratedUsers = new HashSet<>();
     }
 
+    /**
+     * Adds a rating by the given user to the movie.
+     * @param rating the rating to add to the video
+     * @param index unused, used for Shows
+     * @param user the user rating the video
+     * @throws ActionExceptions.EntryNotFoundException if the user is not found in the database
+     * @throws ActionExceptions.NotWatchedException if the video has not been watched
+     * @throws ActionExceptions.AlreadyRatedException if the video has already been rated
+     */
     @Override
-    public void addRating(double rating, int index, User user)
+    public void addRating(final double rating, final int index, final User user)
             throws ActionExceptions.EntryNotFoundException,
             ActionExceptions.NotWatchedException,
             ActionExceptions.AlreadyRatedException {
@@ -35,7 +45,7 @@ public class Movie extends Video {
         }
 
         // Check if the movie has been watched by the user
-        if (!user.hasWatched(getTitle())) {
+        if (user.hasNotWatched(getTitle())) {
             throw new ActionExceptions.NotWatchedException();
         }
 
@@ -49,6 +59,11 @@ public class Movie extends Video {
         ratedUsers.add(user.getUsername());
     }
 
+    /**
+     * Calculates the total rating of the movie by getting the average of
+     * all the numbers in the ratings collection.
+     * @return the average rating, or 0 if unrated
+     */
     @Override
     public double getTotalRating() {
         // Return the mean of all the ratings
@@ -58,6 +73,10 @@ public class Movie extends Video {
                 .orElse(0.0d);
     }
 
+    /**
+     * Gets the duration of the movie.
+     * @return the movie's duration
+     */
     @Override
     public int getDuration() {
         return duration;

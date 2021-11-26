@@ -5,9 +5,15 @@ import database.DatabaseTrackable;
 import entertainment.Video;
 import common.ActionExceptions;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-public class User implements DatabaseTrackable {
+public final class User implements DatabaseTrackable {
+    /**
+     * Possible membership types.
+     */
     public enum SubscriptionType {
         BASIC,
         PREMIUM
@@ -18,9 +24,13 @@ public class User implements DatabaseTrackable {
     private final HashSet<String> favourites;
     private final LinkedHashMap<String, Integer> watchedVideos;
 
+    /**
+     * The number of ratings the user has given.
+     */
     private int ratingCount;
 
-    public User(String username, SubscriptionType subscriptionType, List<String> favourites, Map<String, Integer> watchedVideos) {
+    public User(final String username, final SubscriptionType subscriptionType,
+                final List<String> favourites, final Map<String, Integer> watchedVideos) {
         // Set the basic information
         this.username = username;
         this.subscriptionType = subscriptionType;
@@ -34,25 +44,53 @@ public class User implements DatabaseTrackable {
         this.watchedVideos.putAll(watchedVideos);
     }
 
-    public String getUsername() { return username; }
-
-    public SubscriptionType getSubscriptionType() { return subscriptionType; }
-
-    public int getRatingCount() { return ratingCount; }
-
-    public boolean hasWatched(String title) {
-        return watchedVideos.containsKey(title);
+    public String getUsername() {
+        return username;
     }
 
-    public boolean hasFavourite(String videoTitle) {
+    public SubscriptionType getSubscriptionType() {
+        return subscriptionType;
+    }
+
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    /**
+     * Checks if the user has watched the given video.
+     * @param videoTitle the title of the video
+     * @return true if the user has NOT watched the video
+     */
+    public boolean hasNotWatched(final String videoTitle) {
+        return !watchedVideos.containsKey(videoTitle);
+    }
+
+    /**
+     * Checks if the user has added the given video to favourites.
+     * @param videoTitle the title of the video
+     * @return true if the video is in the favourites collection
+     */
+    public boolean hasFavourite(final String videoTitle) {
         return favourites.contains(videoTitle);
     }
 
-    public int getViews(String videoTitle) {
+    /**
+     * Gets the user's view count of the given video.
+     * @param videoTitle the title of the video
+     * @return the view count
+     */
+    public int getViews(final String videoTitle) {
         return watchedVideos.getOrDefault(videoTitle, 0);
     }
 
-    public void addFavourite(String videoTitle)
+    /**
+     * Adds the given video to favourites.
+     * @param videoTitle the title of the video
+     * @throws ActionExceptions.EntryNotFoundException if the video is not found in the database
+     * @throws ActionExceptions.AlreadyFavouriteException if the video is already a favourite
+     * @throws ActionExceptions.NotWatchedException if the user hasn't watched the video
+     */
+    public void addFavourite(final String videoTitle)
             throws ActionExceptions.EntryNotFoundException,
             ActionExceptions.AlreadyFavouriteException,
             ActionExceptions.NotWatchedException {
@@ -62,7 +100,7 @@ public class User implements DatabaseTrackable {
         }
 
         // Check if the video has been watched
-        if (!hasWatched(videoTitle)) {
+        if (hasNotWatched(videoTitle)) {
             throw new ActionExceptions.NotWatchedException();
         }
 
@@ -75,7 +113,13 @@ public class User implements DatabaseTrackable {
         favourites.add(videoTitle);
     }
 
-    public int addView(String videoTitle)
+    /**
+     * Increments the view count for the given video.
+     * @param videoTitle the title of the video
+     * @return the new view count
+     * @throws ActionExceptions.EntryNotFoundException if the video is not found in the database
+     */
+    public int addView(final String videoTitle)
             throws ActionExceptions.EntryNotFoundException {
         // Check the video's existence within the database
         if (Database.getInstance().retrieveEntity(Video.class, videoTitle) == null) {
@@ -92,15 +136,26 @@ public class User implements DatabaseTrackable {
         return views + 1;
     }
 
+    /**
+     * Adds another rating to the given ratings counter.
+     */
     public void incrementRatingCount() {
         ++ratingCount;
     }
 
+    /**
+     * Gets the primary key for the database, the username.
+     * @return a string containing the username
+     */
     @Override
     public String getKey() {
         return username;
     }
 
+    /**
+     * Prints the username.
+     * @return a string containing the username
+     */
     @Override
     public String toString() {
         return username;

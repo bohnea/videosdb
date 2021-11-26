@@ -11,7 +11,14 @@ import database.DatabaseTrackable;
 import entertainment.Movie;
 import entertainment.Show;
 import entertainment.Video;
-import fileio.*;
+import fileio.ActionInputData;
+import fileio.ActorInputData;
+import fileio.Input;
+import fileio.InputLoader;
+import fileio.MovieInputData;
+import fileio.SerialInputData;
+import fileio.UserInputData;
+import fileio.Writer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import user.User;
@@ -22,7 +29,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * The entry point to this homework. It runs the checker that tests your implementation.
@@ -66,7 +76,11 @@ public final class Main {
         test.testCheckstyle();
     }
 
-    private static void readAndStoreInput(Input input) {
+    /**
+     * Reads the input and stores it in the database.
+     * @param input the input data
+     */
+    private static void readAndStoreInput(final Input input) {
         // Read the actors
         List<ActorInputData> actorInput = input.getActors();
         ArrayList<Actor> actors = new ArrayList<>();
@@ -102,8 +116,7 @@ public final class Main {
                 movie.getTitle(),
                 movie.getYear(),
                 movie.getDuration(),
-                Utils.stringListToGenreList(movie.getGenres()),
-                movie.getCast()
+                Utils.stringListToGenreList(movie.getGenres())
         )));
 
         // Read the shows
@@ -114,7 +127,6 @@ public final class Main {
                 show.getTitle(),
                 show.getYear(),
                 Utils.stringListToGenreList(show.getGenres()),
-                show.getCast(),
                 show.getSeasons()
         )));
 
@@ -124,7 +136,11 @@ public final class Main {
         Database.getInstance().add(videos, Video.class);
     }
 
-    private static void readAndStoreActions(Input input) {
+    /**
+     * Reads the actions from the input and stores them in the database.
+     * @param input the input data
+     */
+    private static void readAndStoreActions(final Input input) {
         // Read the actions
         List<ActionInputData> actionInputList = input.getCommands();
 
@@ -137,7 +153,13 @@ public final class Main {
         Database.getInstance().add(actions, Action.class);
     }
 
-    private static void executeActionsAndWriteOutput(Writer fileWriter, JSONArray arrayResult) {
+    /**
+     * Goes through each action in the database, in order of IDs, and executes them.
+     * @param fileWriter formats messages to JSON
+     * @param arrayResult stores the JSON-formatted action outputs
+     */
+    private static void executeActionsAndWriteOutput(
+            final Writer fileWriter, final JSONArray arrayResult) {
         // Retrieve the actions from the database
         LinkedHashMap<String, DatabaseTrackable> actions;
         actions = Database.getInstance().retrieveClassEntities(Action.class);
@@ -154,9 +176,13 @@ public final class Main {
 
             try {
                 // Write the output to the file
-                JSONObject jsonObj = fileWriter.writeFile(((Action) action).getID(), "", actionOutput);
+                JSONObject jsonObj = fileWriter.writeFile(
+                        ((Action) action).getID(),
+                        "", actionOutput
+                );
+
                 arrayResult.add(jsonObj);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 // Do nothing
             }
         }

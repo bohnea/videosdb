@@ -58,7 +58,7 @@ public final class Utils {
             case "kids" -> Genre.KIDS;
             case "western" -> Genre.WESTERN;
             case "tv movie" -> Genre.TV_MOVIE;
-            default -> Genre.UNKNOWN;
+            default -> null;
         };
     }
 

@@ -19,8 +19,17 @@ import utils.Utils;
 import java.util.List;
 
 public class Query extends Action {
+    /**
+     * Class holding functions for the queries applied on actors.
+     */
     private static class ActorQuery {
-        static List<Actor> average(Query query) {
+        /**
+         * Gets the first n actors sorted in ascending order by the average ratings of the
+         * videos they have cast in, then by their names, only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Actor> average(final Query query) {
             // Get all the actors and remove the ones with no rated videos
             List<Actor> actors = ActorSearch
                     .getAllActors().stream()
@@ -31,15 +40,21 @@ public class Query extends Action {
             // Sort the actors by ratings, then by name
             return SortManager.sortByCriteria(
                     actors,
-                    new SortManager.SortCriteria<Actor>(
+                    new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            ActorComparators.meanRatingComparator,
-                            ActorComparators.nameComparator
+                            ActorComparators.MEAN_RATING_COMPARATOR,
+                            ActorComparators.NAME_COMPARATOR
                     ) // Get the first n actors
             ).subList(0, Math.min(query.number, actors.size()));
         }
 
-        static List<Actor> awards(Query query) {
+        /**
+         * Gets all the actors sorted in ascending order by their total award count,
+         * then by their name, only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Actor> awards(final Query query) {
             // Get the filtered actors
             List<Actor> actors = query.filter.filterActors(
                     ActorSearch.getAllActors()
@@ -50,31 +65,45 @@ public class Query extends Action {
                     actors,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            ActorComparators.awardCountComparator,
-                            ActorComparators.nameComparator
+                            ActorComparators.AWARD_COUNT_COMPARATOR,
+                            ActorComparators.NAME_COMPARATOR
                     )
             );
         }
 
-        static List<Actor> filterDescription(Query query) {
+        /**
+         * Gets all the actors sorted in ascending order by their name,
+         * only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Actor> filterDescription(final Query query) {
             // Get the filtered actors
             List<Actor> actors = query.filter.filterActors(
                     ActorSearch.getAllActors()
             );
 
-            // Sort the actors by award count, then by name
+            // Sort the actors by name
             return SortManager.sortByCriteria(
                     actors,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            ActorComparators.nameComparator
+                            ActorComparators.NAME_COMPARATOR
                     )
             );
         }
     }
 
+    /**
+     * Class holding functions for the queries applied on videos.
+     */
     private static class VideoQuery {
-        private static List<Video> getVideosByObjectType(ObjectType type) {
+        /**
+         * Retrieves videos from the database depending on the given type.
+         * @param type the type of video to retrieve
+         * @return a list of all videos from the database of the specified type
+         */
+        private static List<Video> getVideosByObjectType(final ObjectType type) {
             return switch (type) {
                 case VIDEO -> VideoSearch.getAllVideos();
                 case MOVIE -> VideoSearch.getAllMovies();
@@ -82,7 +111,13 @@ public class Query extends Action {
             };
         }
 
-        static List<Video> rating(Query query) {
+        /**
+         * Gets the first n videos sorted in ascending order by their total rating,
+         * then by their name, only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Video> rating(final Query query) {
             List<Video> videos = query.filter
                     // Get the filtered videos of the given type
                     .filterVideos(getVideosByObjectType(query.objectType)).stream()
@@ -96,13 +131,19 @@ public class Query extends Action {
                     videos,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            VideoComparators.ratingComparator,
-                            VideoComparators.nameComparator
+                            VideoComparators.RATING_COMPARATOR,
+                            VideoComparators.NAME_COMPARATOR
                     ) // Get the first n videos
             ).subList(0, Math.min(query.number, videos.size()));
         }
 
-        static List<Video> favourite(Query query) {
+        /**
+         * Gets the first n videos sorted in ascending order by the number of times they have
+         * been added to favourites, then by their name, only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Video> favourite(final Query query) {
             List<Video> videos = query.filter
                     // Get the filtered videos of the given type
                     .filterVideos(getVideosByObjectType(query.objectType)).stream()
@@ -116,13 +157,19 @@ public class Query extends Action {
                     videos,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            VideoComparators.favouriteCountComparator,
-                            VideoComparators.nameComparator
+                            VideoComparators.FAVOURITE_COUNT_COMPARATOR,
+                            VideoComparators.NAME_COMPARATOR
                     ) // Get the first n videos
             ).subList(0, Math.min(query.number, videos.size()));
         }
 
-        static List<Video> longest(Query query) {
+        /**
+         * Gets the first n videos sorted in ascending order by their duration, then by
+         * their name, only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Video> longest(final Query query) {
             List<Video> videos = query.filter
                     // Get the filtered videos of the given type
                     .filterVideos(getVideosByObjectType(query.objectType));
@@ -132,13 +179,19 @@ public class Query extends Action {
                     videos,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            VideoComparators.durationComparator,
-                            VideoComparators.nameComparator
+                            VideoComparators.DURATION_COMPARATOR,
+                            VideoComparators.NAME_COMPARATOR
                     ) // Get the first n videos
             ).subList(0, Math.min(query.number, videos.size()));
         }
 
-        static List<Video> mostViewed(Query query) {
+        /**
+         * Gets the first n videos sorted in ascending order by their view count,
+         * then by their name, only after they have been filtered.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<Video> mostViewed(final Query query) {
             List<Video> videos = query.filter
                     // Get the filtered videos of the given type
                     .filterVideos(getVideosByObjectType(query.objectType)).stream()
@@ -152,15 +205,21 @@ public class Query extends Action {
                     videos,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            VideoComparators.viewsComparator,
-                            VideoComparators.nameComparator
+                            VideoComparators.VIEWS_COMPARATOR,
+                            VideoComparators.NAME_COMPARATOR
                     ) // Get the first n videos
             ).subList(0, Math.min(query.number, videos.size()));
         }
     }
 
     private static class UserQuery {
-        static List<User> numberOfRatings(Query query) {
+        /**
+         * Gets the first n users sorted in ascending order by their
+         * number of given ratings, then by their name.
+         * @param query the query to execute
+         * @return the query result
+         */
+        static List<User> numberOfRatings(final Query query) {
             List<User> users = UserSearch
                     // Get all users
                     .getAllUsers().stream()
@@ -173,13 +232,16 @@ public class Query extends Action {
                     users,
                     new SortManager.SortCriteria<>(
                             query.sortAscending,
-                            UserComparators.ratingCountComparator,
-                            UserComparators.nameComparator
+                            UserComparators.RATING_COUNT_COMPARATOR,
+                            UserComparators.NAME_COMPARATOR
                     ) // Get the first n users
             ).subList(0, Math.min(query.number, users.size()));
         }
     }
 
+    /**
+     * Enum containing possible query types.
+     */
     public enum Type {
         AVERAGE,
         AWARDS,
@@ -188,14 +250,21 @@ public class Query extends Action {
         FAVOURITE,
         LONGEST,
         MOST_VIEWED,
-        NUMBER_OF_RATINGS
+        NUMBER_OF_RATINGS,
+        OTHER
     }
 
+    /**
+     * Enum containing possible sort orders.
+     */
     public enum SortType {
         ASCENDING,
         DESCENDING
     }
 
+    /**
+     * Enum containing possible query object types.
+     */
     public enum ObjectType {
         VIDEO,
         MOVIE,
@@ -208,7 +277,13 @@ public class Query extends Action {
     private final boolean sortAscending;
     private Filter filter;
 
-    public Query(Integer id, Type type, ObjectType objectType, int number, List<List<String>> filter, SortType sortType) {
+    public static final int YEAR_INDEX = 0;
+    public static final int GENRE_INDEX = 1;
+    public static final int WORDS_INDEX = 2;
+    public static final int AWARDS_INDEX = 3;
+
+    public Query(final Integer id, final Type type, final ObjectType objectType,
+                 final int number, final List<List<String>> filter, final SortType sortType) {
         super(id);
         this.type = type;
         this.objectType = objectType;
@@ -222,17 +297,31 @@ public class Query extends Action {
 
         // Create the filter
         this.filter = createFilter(
-                filter.get(0).get(0), // Get the year string
-                filter.get(1).get(0), // Get the genre string
-                filter.get(2),        // Get the words list
-                filter.get(3)         // Get the awards list
+                filter.get(YEAR_INDEX).get(0),   // Get the year string
+                filter.get(GENRE_INDEX).get(0),  // Get the genre string
+                filter.get(WORDS_INDEX),         // Get the words list
+                filter.get(AWARDS_INDEX)         // Get the awards list
         );
     }
 
-    private Filter createFilter(String yearStr, String genreStr, List<String> words, List<String> awardsStr) {
-        // Parse the strings, if they exist
+    /**
+     * Creates a new Filter object from the given String parameters.
+     * @param yearStr the year string
+     * @param genreStr the genre string
+     * @param words the words list
+     * @param awardsStr the awards list
+     * @return the new Filter object
+     */
+    private Filter createFilter(final String yearStr, final String genreStr,
+                                final List<String> words, final List<String> awardsStr) {
+        // Parse the year, if it exists
         int year = (yearStr == null) ? -1 : Integer.parseInt(yearStr);
+
+        // Parse the genre, if it exists
+        boolean sortByGenre = genreStr != null;
         Genre genre = Utils.stringToGenre(genreStr);
+
+        // Parse the award list, if it exists
         List<ActorsAwards> awards =
                 awardsStr == null
                         ? null
@@ -242,7 +331,7 @@ public class Query extends Action {
 
         // Check which filter constructor to use
         if (year != -1 || genre != null) {
-            return new Filter(year, genre);
+            return new Filter(year, sortByGenre, genre);
         } else if (words != null || awards != null) {
             return new Filter(words, awards);
         }
@@ -251,6 +340,10 @@ public class Query extends Action {
         return new Filter();
     }
 
+    /**
+     * Executes the query.
+     * @return a message with the result of the action execution
+     */
     @Override
     public String execute() {
         // Retrieve the query
@@ -263,6 +356,7 @@ public class Query extends Action {
             case LONGEST -> VideoQuery.longest(this);
             case MOST_VIEWED -> VideoQuery.mostViewed(this);
             case NUMBER_OF_RATINGS -> UserQuery.numberOfRatings(this);
+            default -> null;
         };
     }
 }

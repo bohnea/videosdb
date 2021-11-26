@@ -13,8 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Recommendation extends Action {
+    /**
+     * Basic membership functionality.
+     */
     private static class BasicRecommendation {
-        static List<String> standard(List<Video> videos) {
+        /**
+         * Recommends the first unwatched video from the database.
+         * @param videos the unwatched videos
+         * @return the title of the video
+         */
+        static List<String> standard(final List<Video> videos) {
             // Check if the list is empty
             if (videos.isEmpty()) {
                 return null;
@@ -24,34 +32,49 @@ public class Recommendation extends Action {
             return List.of(videos.get(0).getTitle());
         }
 
-        static List<String> bestUnseen(List<Video> videos) {
+        /**
+         * Recommends the first unwatched video from the database, after sorting the videos
+         * in descending order by their total rating.
+         * @param videos the unwatched videos
+         * @return the title of the video
+         */
+        static List<String> bestUnseen(final List<Video> videos) {
             // Sort the videos by rating
-            videos = SortManager.sortByCriteria(
+            List<Video> sortedVideos = SortManager.sortByCriteria(
                     videos,
                     new SortManager.SortCriteria<>(
                             false,
-                            VideoComparators.ratingComparator
+                            VideoComparators.RATING_COMPARATOR
                     ) // Get the first n videos
             );
 
             // Check if the list is empty
-            if (videos.isEmpty()) {
+            if (sortedVideos.isEmpty()) {
                 return null;
             }
 
             // Otherwise, create a success message
-            return List.of(videos.get(0).getTitle());
+            return List.of(sortedVideos.get(0).getTitle());
         }
     }
 
+    /**
+     * Premium membership functionality.
+     */
     private static class PremiumRecommendation {
-        static List<String> popular(List<Video> videos) {
+        /**
+         * Recommends the first unwatched video from the database, of the genre with the most
+         * amount of views and with yet unwatched videos.
+         * @param videos the unwatched videos
+         * @return the title of the video
+         */
+        static List<String> popular(final List<Video> videos) {
             // Get all the genres sorted by views
             List<Genre> sortedGenres = SortManager.sortByCriteria(
                     Arrays.asList(Genre.values()),
                     new SortManager.SortCriteria<>(
                             false,
-                            VideoComparators.genreViewsComparator
+                            VideoComparators.GENRE_VIEWS_COMPARATOR
                     )
             );
 
@@ -70,44 +93,57 @@ public class Recommendation extends Action {
             return null;
         }
 
-        static List<String> favourite(List<Video> videos) {
-            videos = videos.stream()
+        /**
+         * Recommends the first unwatched video from the database, after sorting the videos
+         * in descending order by the number of users that have added them to favourites.
+         * @param videos the unwatched videos
+         * @return the title of the video
+         */
+        static List<String> favourite(final List<Video> videos) {
+            List<Video> sortedVideos = videos.stream()
                     // Remove the ones that have not been added to favourites by anyone
                     .filter(video -> VideoSearch.getFavouriteCount(video) != 0)
                     // Make it into a list
                     .toList();
 
             // Check if the list is empty
-            if (videos.isEmpty()) {
+            if (sortedVideos.isEmpty()) {
                 return null;
             }
 
             // Sort the videos by favourite count
             return List.of(SortManager.sortByCriteria(
-                    videos,
+                    sortedVideos,
                     new SortManager.SortCriteria<>(
                             false,
-                            VideoComparators.favouriteCountComparator
+                            VideoComparators.FAVOURITE_COUNT_COMPARATOR
                     ) // Get the first video in the list, and then its title
             ).get(0).getTitle());
         }
 
-        static List<String> search(List<Video> videos, Genre genre) {
+        /**
+         * Recommends all unwatched videos of a given genre from the database, after sorting
+         * them in ascending order by their total rating, then by their name.
+         * @param videos the unwatched videos
+         * @param genre the genre to search after
+         * @return the titles of the videos
+         */
+        static List<String> search(final List<Video> videos, final Genre genre) {
             // Get all unwatched videos of the given genre
-            videos = VideoSearch.getVideosOfGenre(videos, genre);
+            List<Video> sortedVideos = VideoSearch.getVideosOfGenre(videos, genre);
 
             // Check if the list is empty
-            if (videos.isEmpty()) {
+            if (sortedVideos.isEmpty()) {
                 return null;
             }
 
             // Sort the videos by rating, then by name
             return SortManager.sortByCriteria(
-                    videos,
+                    sortedVideos,
                     new SortManager.SortCriteria<>(
                             true,
-                            VideoComparators.ratingComparator,
-                            VideoComparators.nameComparator
+                            VideoComparators.RATING_COMPARATOR,
+                            VideoComparators.NAME_COMPARATOR
                     )
             ).stream()
                     // Get the titles
@@ -116,6 +152,9 @@ public class Recommendation extends Action {
         }
     }
 
+    /**
+     * Enum containing possible recommendation types.
+     */
     public enum Type {
         STANDARD,
         BEST_UNSEEN,
@@ -128,17 +167,26 @@ public class Recommendation extends Action {
     private final String username;
     private final Genre genre;
 
-    public Recommendation(Integer id, Type type, String username, Genre genre) {
+    public Recommendation(final Integer id, final Type type,
+                          final String username, final Genre genre) {
         super(id);
         this.type = type;
         this.username = username;
         this.genre = genre;
     }
 
-    private void writeMessageBeginning(StringBuilder message, Type type, boolean isSuccessful) {
+    /**
+     * Writes the output of the given action to the message, without the results of the
+     * recommendation. Writes both fail and success messages, based on the recommendation type.
+     * @param message the message to add text to
+     * @param recommendationType the recommendation type
+     * @param isSuccessful success / fail message
+     */
+    private void writeMessageBeginning(final StringBuilder message,
+                                       final Type recommendationType, final boolean isSuccessful) {
         message.append(
                 // Get the string from the type
-                switch(type) {
+                switch (recommendationType) {
                     case STANDARD -> "Standard";
                     case BEST_UNSEEN -> "BestRatedUnseen";
                     case POPULAR -> "Popular";
@@ -154,7 +202,15 @@ public class Recommendation extends Action {
         }
     }
 
-    private void writeResultToMessage(StringBuilder message, List<String> result, boolean isList) {
+    /**
+     * Writes the second part of the message, the results of the recommendation,
+     * either as a list or a single string.
+     * @param message the message to add text to
+     * @param result the results of the recommendation
+     * @param isList write as a list / individual
+     */
+    private void writeResultToMessage(final StringBuilder message,
+                                      final List<String> result, final boolean isList) {
         if (isList) {
             message.append(result);
         } else {
@@ -162,6 +218,10 @@ public class Recommendation extends Action {
         }
     }
 
+    /**
+     * Executes the recommendation.
+     * @return a message with the result of the action execution
+     */
     @Override
     public String execute() {
         // Construct the return string

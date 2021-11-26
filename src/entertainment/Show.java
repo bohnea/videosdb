@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public class Show extends Video {
-    private ArrayList<Season> seasons;
-    private HashMap<Integer, HashSet<String>> ratedUsers;
+public final class Show extends Video {
+    private final ArrayList<Season> seasons;
+    private final HashMap<Integer, HashSet<String>> ratedUsers;
 
-    public Show(String title, int launchYear, List<Genre> genres, List<String> cast, List<Season> seasons) {
+    public Show(final String title, final int launchYear,
+                final List<Genre> genres, final List<Season> seasons) {
         // Set the common video values
-        super(title, launchYear, genres, cast);
+        super(title, launchYear, genres);
 
         // Create the seasons list and add all the given seasons
         this.seasons = new ArrayList<>();
@@ -27,8 +28,17 @@ public class Show extends Video {
         }
     }
 
+    /**
+     * Adds a rating by the given user to the show's given season.
+     * @param rating the rating to add to the video
+     * @param index the index of the season
+     * @param user the user rating the video
+     * @throws ActionExceptions.EntryNotFoundException if the user is not found in the database
+     * @throws ActionExceptions.NotWatchedException if the video has not been watched
+     * @throws ActionExceptions.AlreadyRatedException if the video has already been rated
+     */
     @Override
-    public void addRating(double rating, int index, User user)
+    public void addRating(final double rating, final int index, final User user)
             throws ActionExceptions.EntryNotFoundException,
             ActionExceptions.NotWatchedException,
             ActionExceptions.AlreadyRatedException {
@@ -38,7 +48,7 @@ public class Show extends Video {
         }
 
         // Check if the show has been watched by the user
-        if (!user.hasWatched(getTitle())) {
+        if (user.hasNotWatched(getTitle())) {
             throw new ActionExceptions.NotWatchedException();
         }
 
@@ -55,7 +65,12 @@ public class Show extends Video {
         ratedUsers.get(index).add(user.getUsername());
     }
 
-    private double getSeasonRating(Season season) {
+    /**
+     * Calculates the average rating of the given season.
+     * @param season the season to get the average rating for
+     * @return the average rating
+     */
+    private double getAverageSeasonRating(final Season season) {
         // If the season has no ratings, consider the rating 0
         if (season.getRatings().isEmpty()) {
             return 0.0d;
@@ -66,15 +81,24 @@ public class Show extends Video {
                 .reduce(0.0d, Double::sum) / season.getRatings().size();
     }
 
+    /**
+     * Calculates the total rating of the show by getting the average of
+     * all the seasons' ratings.
+     * @return the average rating, or 0 if unrated
+     */
     @Override
     public double getTotalRating() {
         // Return the mean of all the ratings of all the seasons
         return seasons.stream()
-                .mapToDouble(this::getSeasonRating)
+                .mapToDouble(this::getAverageSeasonRating)
                 .average()
                 .orElse(0.0d);
     }
 
+    /**
+     * Gets the duration of the show by adding the durations of the seasons.
+     * @return the show's duration
+     */
     @Override
     public int getDuration() {
         return seasons.stream()
