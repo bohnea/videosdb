@@ -58,13 +58,12 @@ public final class VideoSearch {
         // Retrieve the given video from the database
         DatabaseTrackable video = Database.getInstance().retrieveEntity(Video.class, title);
 
-        // Check if it's the correct type, or it is null
-        if (!(video instanceof Video)) {
+        try {
+            // Check if the video is of the correct type
+            return (Video) video;
+        } catch (ClassCastException e) {
             return null;
         }
-
-        // Return the video
-        return (Video) video;
     }
 
     /**

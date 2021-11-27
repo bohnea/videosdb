@@ -165,19 +165,24 @@ public final class Main {
         actions = Database.getInstance().retrieveClassEntities(Action.class);
 
         // Iterate though each action and execute it
-        for (DatabaseTrackable action : actions.values()) {
-            // Safety instanceof, I don't think this is needed but just to be sure
-            if (!(action instanceof Action)) {
+        for (DatabaseTrackable databaseTrackable : actions.values()) {
+            // Define the action
+            Action action;
+
+            try {
+                // Try to cast the databaseTrackable to Action
+                action = (Action) databaseTrackable;
+            } catch (ClassCastException e) {
                 continue;
             }
 
             // Execute the action and keep the output
-            String actionOutput = ((Action) action).execute();
+            String actionOutput = action.execute();
 
             try {
                 // Write the output to the file
                 JSONObject jsonObj = fileWriter.writeFile(
-                        ((Action) action).getID(),
+                        action.getID(),
                         "", actionOutput
                 );
 

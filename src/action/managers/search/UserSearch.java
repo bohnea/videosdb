@@ -30,12 +30,11 @@ public final class UserSearch {
         // Retrieve the given user from the database
         DatabaseTrackable user = Database.getInstance().retrieveEntity(User.class, username);
 
-        // Check if it's the correct type
-        if (!(user instanceof User)) {
+        try {
+            // Check if the user is of the correct type
+            return (User) user;
+        } catch (ClassCastException e) {
             return null;
         }
-
-        // Return the user
-        return (User) user;
     }
 }
