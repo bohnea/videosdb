@@ -1,38 +1,37 @@
-Object Oriented Programming Course
-Homework - VideosDB
+**Project by:** Mihnea Tudor \
+**Group:** 321CAb
 
-November 2021
+University Politehnica of Bucharest \
+Faculty of Computer Science and Automatic Control
 
-# Info
-https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/tema
+#VideosDB
+***
 
-# About the code
+##Project overview
+***
 
-We provide the input tests, the logic that parses them and the checker that runs them.
+This project simulates a *database* that keeps track of *videos*, *actors*, *users* and *actions* that can be performed
+on the database.
+There are three types of actions: *command*, *query* and *recommendation*. Commands can modify the entities stored in
+the database, while queries and recommendations can only retrieve information and process it.
+Each individual component, along with the general design and the links between entities, will be detailed in the
+following sections.
 
-* test_db - contains the tests in JSON format
-* src
-   * checker - the checker's sources including the checkstyle necessary files, not to be modified
-   * fileio - classes for parsing the input files, not to be modified
-   * common, utils
-        * contain utility classes with constants and static methods
-        * you can add your own functionality in the existing classes or add new classes as well
-   * actor
-        * contains an enum for the types of awards an actor can have - do not modify it
-        * you can add here your actor related classes
-   * entertainment
-        * contains an enum for the supported video genres - do not modify it
-        * class for representing a Season of a tv show - do not modify it
-        * you can add here your entertainment related classes
 
-We encourage you to organize your implementation in packages based on the functionality their classes offer. Try to keep
-your code modular, readable and documented.
+##Temporary header name
+***
 
-# Testing
+With some text added to make it look full.
 
-The Main class runs the checker on your implementation. Add the entry point to your implementation in it.
 
-Run Main to test your implementation from the IDE or from command line.
+## Additional remarks
+***
 
-Run the main method from Test class with the name of the input file from the command line and the result will be written
-to the out.txt file. Thus, you can compare this result with ref.
+A few java features used in the creation of this project were new to me, so I would love some feedback on their design
+(alongside feedback on the general design of the project - package structure, dependencies, possible design patterns
+etc.)
+
+Some examples of java features include:
+ * the complicated database object in the class with the same name (not even sure if that was a good idea, but it was 
+a great challenge)
+ * the exceptions used as error codes for the commands
