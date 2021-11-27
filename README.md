@@ -4,11 +4,9 @@
 University Politehnica of Bucharest \
 Faculty of Computer Science and Automatic Control
 
-#VideosDB
-***
+# VideosDB
 
-##Project overview
-***
+## Project overview
 
 This project simulates a *database* that keeps track of *videos*, *actors*, *users* and *actions* that can be performed
 on the database.
@@ -18,14 +16,12 @@ Each individual component, along with the general design and the links between e
 following sections.
 
 
-##Temporary header name
-***
+## Temporary header name
 
 With some text added to make it look full.
 
 
 ## Additional remarks
-***
 
 A few java features used in the creation of this project were new to me, so I would love some feedback on their design
 (alongside feedback on the general design of the project - package structure, dependencies, possible design patterns
